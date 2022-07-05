@@ -1,0 +1,3 @@
+[submodule "srb2kart"]
+	path = srb2kart
+	url = git@github.com:formulabun/srb2kart.git
