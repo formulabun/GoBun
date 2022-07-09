@@ -1,4 +1,4 @@
-module containerinput
+module GoBun
 
 go 1.18
 
