@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  db:
+    image: mongo:5.0.9
+    ports:
+      - 27017:27017
+    network_mode:
+      host
+    volumes:
+      - database:/data/db
+  scripts:
+    build:
+      dockerfile: Dockerfile.scripts
+    stdin_open: true
+    tty: true
+    network_mode:
+      host
+volumes:
+  database: {}
