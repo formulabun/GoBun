@@ -1,3 +1,3 @@
 package constants
 
-const BasePath = "/tmp/tmp.6sBBXfWESA"
+const BasePath = "/data/files"
