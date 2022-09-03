@@ -1,10 +1,10 @@
 package common
 
 import (
-  "context"
-  "time"
+	"context"
+	"time"
 )
 
 func MakeContext() (context.Context, func()) {
-  return context.WithTimeout(context.Background(), 10*time.Second)
+	return context.WithTimeout(context.Background(), 10*time.Second)
 }

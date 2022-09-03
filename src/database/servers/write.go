@@ -1,27 +1,27 @@
 package servers
 
 import (
-  "go.mongodb.org/mongo-driver/bson"
-  "go.mongodb.org/mongo-driver/mongo"
-  "go.mongodb.org/mongo-driver/mongo/options"
-  "GoBun/srb2kart"
-  "GoBun/database/common"
+	"GoBun/database/common"
+	"GoBun/srb2kart"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func SetServer(collection *mongo.Collection, server srb2kart.Srb2kart) (error) {
-  ctx, cancel := common.MakeContext()
-  defer cancel()
-  filter := makeKeyFilter(server)
+func SetServer(collection *mongo.Collection, server srb2kart.Srb2kart) error {
+	ctx, cancel := common.MakeContext()
+	defer cancel()
+	filter := makeKeyFilter(server)
 
-  _, err := collection.UpdateOne(ctx, filter, bson.D{{"$set", server}}, options.Update().SetUpsert(true))
-  return err
+	_, err := collection.UpdateOne(ctx, filter, bson.D{{"$set", server}}, options.Update().SetUpsert(true))
+	return err
 }
 
-func RemoveServer(collection *mongo.Collection, name string) (error) {
-  ctx, cancel := common.MakeContext()
-  defer cancel()
-  filter := keyFilter{name}
+func RemoveServer(collection *mongo.Collection, name string) error {
+	ctx, cancel := common.MakeContext()
+	defer cancel()
+	filter := keyFilter{name}
 
-  _, err := collection.DeleteOne(ctx, filter)
-  return err
+	_, err := collection.DeleteOne(ctx, filter)
+	return err
 }
