@@ -1,16 +1,15 @@
 package addons
 
 type AddonCollection interface {
-  Addons() []string
-  Format() []string
+	Addons() []string
+	Format() []string
 }
 
 type Addon struct {
-  File string
+	File string
 }
 
 type AddonGroup struct {
-  GroupName string
-  Items []AddonCollection
-};
-
+	GroupName string
+	Items     []AddonCollection
+}

@@ -1,13 +1,13 @@
 package main
 
 import (
+	"GoBun/scripts/addons/add"
+	"GoBun/scripts/addons/list"
+	"GoBun/scripts/addons/remove"
+	"GoBun/scripts/addons/set"
 	"fmt"
 	"os"
-  "path/filepath"
-  "GoBun/scripts/addons/add"
-  "GoBun/scripts/addons/list"
-  "GoBun/scripts/addons/set"
-  "GoBun/scripts/addons/remove"
+	"path/filepath"
 )
 
 var addMethod = []string{"add", "a"}
@@ -15,9 +15,8 @@ var removeMethod = []string{"remove", "rem", "r"}
 var listMethod = []string{"list", "ls", "l"}
 var setMethod = []string{"set", "s"}
 
-
 func printUsage() {
-  var base = filepath.Base(os.Args[0])
+	var base = filepath.Base(os.Args[0])
 	fmt.Printf("usage: %s {add,remove,list,set}\n", base)
 }
 
@@ -32,11 +31,11 @@ func main() {
 	case isAdd(method):
 		add.Add()
 	case isRemove(method):
-    remove.Remove()
+		remove.Remove()
 	case isList(method):
 		list.List()
-  case isSet(method):
-    set.Set()
+	case isSet(method):
+		set.Set()
 	default:
 		printUsage()
 	}
@@ -55,7 +54,7 @@ func isList(method string) bool {
 }
 
 func isSet(method string) bool {
-  return contains(method, setMethod)
+	return contains(method, setMethod)
 }
 
 func contains(value string, array []string) bool {

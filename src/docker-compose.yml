@@ -15,5 +15,8 @@ services:
     tty: true
     network_mode:
       host
+    volumes:
+      - files:/data/files
 volumes:
   database: {}
+  files: {}

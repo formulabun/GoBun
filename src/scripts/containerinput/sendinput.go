@@ -1,7 +1,7 @@
 package main
 
 import (
-	"GoBun/docker/container/input"
+	"GoBun/docker/container"
 	"context"
 	"fmt"
 	"github.com/docker/docker/api/types"
@@ -33,6 +33,6 @@ func main() {
 	cli, err := client.NewClientWithOpts()
 	exitOnError(err, "Coudn't start the client.")
 
-	container := findContainer(cli)
-	input.SendInput(cli, container, strings.Join(os.Args[1:], " "))
+	dockerContainer := findContainer(cli)
+	container.SendInput(cli, dockerContainer, strings.Join(os.Args[1:], " "))
 }

@@ -1,14 +1,21 @@
 package srb2kart
 
 import (
-  "GoBun/srb2kart/addons"
+	"GoBun/docker/volume"
 )
 
-type srb2kart struct {
-  Name string
-  Port int
-  Volumes []Volume
-  Addons addons.AddonCollection
-};
+type Srb2kart struct {
+	Name       string
+	Port       int
+	Volumes    volume.VolumeSet
+	AddonGroup string
+}
 
-type Volume string;
+func DefaultSrb2kart() Srb2kart {
+	return Srb2kart{
+		"srb2kart",
+		5029,
+		volume.VolumeSet{},
+		"addons",
+	}
+}
