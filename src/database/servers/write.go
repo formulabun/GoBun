@@ -16,3 +16,12 @@ func SetServer(collection *mongo.Collection, server srb2kart.Srb2kart) (error) {
   _, err := collection.UpdateOne(ctx, filter, bson.D{{"$set", server}}, options.Update().SetUpsert(true))
   return err
 }
+
+func RemoveServer(collection *mongo.Collection, name string) (error) {
+  ctx, cancel := common.MakeContext()
+  defer cancel()
+  filter := keyFilter{name}
+
+  _, err := collection.DeleteOne(ctx, filter)
+  return err
+}

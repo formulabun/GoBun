@@ -34,5 +34,16 @@ func ListServers(collection *mongo.Collection) ([]srb2kart.Srb2kart, error) {
 }
 
 func Server(collection *mongo.Collection, name string) (srb2kart.Srb2kart, error) {
-  return srb2kart.Srb2kart{}, nil
+  ctx, cancel := common.MakeContext()
+  defer cancel()
+
+  result := srb2kart.Srb2kart{}
+  filter := keyFilter{name}
+  found := collection.FindOne(ctx, filter)
+
+  err := found.Decode(&result)
+  if err != nil {
+    return result, fmt.Errorf("could not decode item: %s", err)
+  }
+  return result, nil
 }

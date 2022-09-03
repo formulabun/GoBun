@@ -7,6 +7,7 @@ import (
   "GoBun/scripts/common/subcommand"
   "GoBun/scripts/kartserver/list"
   "GoBun/scripts/kartserver/set"
+  "GoBun/scripts/kartserver/remove"
 )
 
 var listOptions = []string{"list"}
@@ -18,7 +19,7 @@ func printUsage(options fmt.Stringer) {
 
 func main() {
   commands := subcommand.Registry{}
-  commands.Register(list.List).Register(set.Set)
+  commands.Register(list.List).Register(set.Set).Register(remove.Remove)
 
   if len(os.Args) < 2 {
     printUsage(commands)

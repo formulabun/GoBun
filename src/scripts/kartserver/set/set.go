@@ -6,7 +6,7 @@ import (
   "GoBun/database"
   "GoBun/functional/strings"
   "GoBun/srb2kart"
-  "GoBun/srb2kart/volumes"
+  "GoBun/docker/volume"
   "fmt"
 )
 
@@ -28,8 +28,8 @@ func parsePort(index *int, args []string) (int, error) {
   return int(p), err
 }
 
-func parseVolumes(index *int, args []string) (volumes.VolumeSet, error) {
-  res := volumes.VolumeSet{args[*index], args[*index +1]}
+func parseVolumes(index *int, args []string) (volume.VolumeSet, error) {
+  res := volume.VolumeSet{[]string{args[*index], args[*index +1]}}
   *index += 2
   return res, nil
 }
@@ -54,13 +54,13 @@ func parseArguments(args[] string) (srb2kart.Srb2kart, error) {
       p, err = parsePort(&i, args)
       res.Port = p
     case volumesFlag:
-      var v volumes.VolumeSet
+      var v volume.VolumeSet
       v, err = parseVolumes(&i, args)
       res.Volumes = v
     case addonFlag:
       var a string
       a, err = parseAddonGroup(&i, args)
-      res.AddonGroupName = a
+      res.AddonGroup = a
     default:
       return res, fmt.Errorf("Unknown flag \"%s\"", flag)
     }
