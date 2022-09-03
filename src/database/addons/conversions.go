@@ -5,10 +5,10 @@ import (
 )
 
 func contentToCollection(in content) addons.AddonCollection {
-	if in.Kind == "file" {
-		return addons.Addon{File: in.Value}
-	} else if in.Kind == "group" {
-		return addons.AddonGroup{GroupName: in.Value}
+	if in.kind == fileType {
+		return addons.Addon{File: in.value}
+	} else if in.kind == groupType {
+		return addons.AddonGroup{GroupName: in.value}
 	}
 
 	return addons.Addon{}

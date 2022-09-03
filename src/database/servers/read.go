@@ -25,7 +25,7 @@ func ListServers(collection *mongo.Collection) ([]srb2kart.Srb2kart, error) {
 	for cursor.Next(ctx) {
 		err := cursor.Decode(&item)
 		if err != nil {
-			fmt.Printf("Failed to decode an server document: %s", err)
+			fmt.Printf("Failed to decode a server document, skipping: %s", err)
 		}
 		result = append(result, item)
 	}

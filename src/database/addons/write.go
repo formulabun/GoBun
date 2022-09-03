@@ -20,8 +20,8 @@ func SetAddonGroupContent(collection *mongo.Collection, groupName string, items 
 	filter := groupFilter{groupName}
 	groupItems := array.Map(items, func(item string) content {
 		return content{
-			Kind:  "group",
-			Value: item,
+			kind:  groupType,
+			value: item,
 		}
 	})
 
@@ -32,11 +32,11 @@ func SetAddonGroupContent(collection *mongo.Collection, groupName string, items 
 }
 
 func AddAddonGroup(collection *mongo.Collection, toGroup string, newGroups []string) error {
-	return addAddonGroup(collection, toGroup, "group", newGroups)
+	return addAddonGroup(collection, toGroup, groupType, newGroups)
 }
 
 func AddAddonFile(collection *mongo.Collection, toGroup string, newFiles []string) error {
-	return addAddonGroup(collection, toGroup, "file", newFiles)
+	return addAddonGroup(collection, toGroup, fileType, newFiles)
 }
 
 func RemoveItemFromGroup(collection *mongo.Collection, groupName string, item string) error {
@@ -65,8 +65,8 @@ func addAddonGroup(collection *mongo.Collection, toGroup, kind string, items []s
 	filter := groupFilter{toGroup}
 	toAdd := array.Map(items, func(item string) content {
 		return content{
-			Kind:  kind,
-			Value: item,
+			kind:  kind,
+			value: item,
 		}
 	})
 	update := bson.D{{"$push", bson.D{{"content", bson.D{{"$each", toAdd}}}}}}

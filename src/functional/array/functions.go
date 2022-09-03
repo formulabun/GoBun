@@ -1,7 +1,5 @@
 package array
 
-type Possible = interface{}
-
 func Map[T any, P any](array []T, function func(T) P) []P {
 	result := make([]P, len(array))
 	for i, t := range array {

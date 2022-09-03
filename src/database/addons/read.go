@@ -28,7 +28,7 @@ func ListAddonGroups(collection *mongo.Collection) (result addons.AddonGroup, er
 		if err != nil {
 			fmt.Printf("Failed at decoding while listing all groups: %s", err)
 		}
-		result.Items = append(result.Items, addons.Addon{item.Name})
+		result.Items = append(result.Items, addons.Addon{item.name})
 	}
 
 	return result, nil
@@ -46,17 +46,25 @@ func _addonGroup(ctx context.Context, collection *mongo.Collection, addonGroup s
 	found := collection.FindOne(ctx, groupFilter{addonGroup})
 
 	var item group
-	found.Decode(&item)
-	result.GroupName = item.Name
+	err = found.Decode(&item)
+	if err != nil {
+		return result, fmt.Errorf("Error decoding addon group %s: %s", addonGroup, err)
+	}
+	result.GroupName = item.name
 
-	result.Items = make([]addons.AddonCollection, len(item.Content))
+	result.Items = make([]addons.AddonCollection, len(item.content))
 
-	for i, v := range item.Content {
-		if v.Kind == "group" {
-			var group, _ = _addonGroup(ctx, collection, v.Value)
+	for i, v := range item.content {
+		if v.kind == groupType {
+			var group, err = _addonGroup(ctx, collection, v.value)
+			if err != nil {
+				return result, fmt.Errorf("Error while decoding item %s for group %s: %s", v.value, addonGroup, err)
+			}
 			result.Items[i] = group
-		} else {
+		} else if v.kind == fileType {
 			result.Items[i] = contentToCollection(v)
+		} else {
+			return result, fmt.Errorf("Incorrect type of item %s for addon group %s", v.value, addonGroup)
 		}
 	}
 

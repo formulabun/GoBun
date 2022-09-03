@@ -10,8 +10,6 @@ import (
 	"path/filepath"
 )
 
-var listOptions = []string{"list"}
-
 func printUsage(options fmt.Stringer) {
 	base := filepath.Base(os.Args[0])
 	fmt.Printf("%s %s\n", base, options)
