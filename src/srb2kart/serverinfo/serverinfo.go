@@ -21,11 +21,13 @@ var getServerInfoPacket = [...]byte{
 type packetType uint8
 
 const (
-	_PACKETTYPE_SERVERINFO packetType = 0x0D
-	_PACKETTYPE_CLIENTINFO packetType = 0x0E
+	packetTypeServerInfo packetType = 0x0D
+	packetTypeClientInfo packetType = 0x0E
 )
 
-type KartPacket interface{}
+type KartPacket interface{
+	GetPacketType() packetType
+}
 
 type KartPacketHeader struct {
 	Checksum   uint32
@@ -86,6 +88,10 @@ type KartServerInfoPacket struct {
 	FileNeeded     [915]uint8
 }
 
+func (p *KartServerInfoPacket) GetPacketType() packetType {
+	return p.Header.PacketType
+}
+
 type kartClientInfoEntryRaw struct {
 	Node         uint8
 	Name         [21 + 1]byte
@@ -118,6 +124,10 @@ type KartClientInfoPacket struct {
 	ClientInfo []KartClientInfoEntry
 }
 
+func (p *KartClientInfoPacket) GetPacketType() packetType {
+	return p.Header.PacketType
+}
+
 func nullTerminated(data []byte) string {
 	newBytes := make([]byte, 0)
 
@@ -138,9 +148,9 @@ func readPacket(data []byte) (KartPacket, error) {
 	}
 
 	switch header.PacketType {
-	case _PACKETTYPE_SERVERINFO:
+	case packetTypeServerInfo:
 		return unpackServerInfoPacket(data[:])
-	case _PACKETTYPE_CLIENTINFO:
+	case packetTypeClientInfo:
 		return unpackClientInfoPacket(data[:])
 	default:
 		return nil, fmt.Errorf("unknown packet type: %d", header.PacketType)
@@ -229,19 +239,19 @@ func GetSRB2Info(adress string) (*KartServerInfoPacket, *KartClientInfoPacket, e
 		buffer := make([]byte, 2048)
 		_, _, err := conn.ReadFromUDP(buffer)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("error getting information from udp: %w", err)
 		}
 
 		packet, err := readPacket(buffer[:])
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("error reading packet: %w", err)
 		}
 
-		switch castPacket := packet.(type) {
-		case *KartServerInfoPacket:
-			serverInfoPacket = castPacket
-		case *KartClientInfoPacket:
-			clientInfoPacket = castPacket
+		switch packetType := packet.GetPacketType(); packetType {
+		case packetTypeServerInfo:
+			serverInfoPacket = packet.(*KartServerInfoPacket)
+		case packetTypeClientInfo:
+			clientInfoPacket = packet.(*KartClientInfoPacket)
 		}
 	}
 
