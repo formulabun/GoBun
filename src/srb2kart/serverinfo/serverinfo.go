@@ -85,11 +85,18 @@ type KartServerInfoPacket struct {
 	ActNum         uint8
 	IsZone         uint8
 	HttpSource     string
-	FileNeeded     [915]uint8
+	FileNeeded     []FileNeededEntry
 }
 
 func (p *KartServerInfoPacket) GetPacketType() packetType {
 	return p.Header.PacketType
+}
+
+type FileNeededEntry struct {
+	WillSend bool
+	TotalSize uint32
+	FileName string
+	MD5 [16]uint8
 }
 
 type kartClientInfoEntryRaw struct {
@@ -143,18 +150,36 @@ func nullTerminated(data []byte) string {
 
 func readPacket(data []byte) (KartPacket, error) {
 	header := KartPacketHeader{}
-	if err := binary.Read(bytes.NewReader(data[:]), binary.LittleEndian, &header); err != nil {
+	if err := binary.Read(bytes.NewReader(data), binary.LittleEndian, &header); err != nil {
 		return nil, err
 	}
 
 	switch header.PacketType {
 	case packetTypeServerInfo:
-		return unpackServerInfoPacket(data[:])
+		return unpackServerInfoPacket(data)
 	case packetTypeClientInfo:
-		return unpackClientInfoPacket(data[:])
+		return unpackClientInfoPacket(data)
 	default:
 		return nil, fmt.Errorf("unknown packet type: %d", header.PacketType)
 	}
+}
+
+func parseFileNeeded(data [915]byte, fileNeededCount int) []FileNeededEntry {
+	var entries []FileNeededEntry
+	buf := bytes.NewBuffer(data[:])
+	for i := 0; i < fileNeededCount; i++ {
+		entry := FileNeededEntry{}
+		binary.Read(buf, binary.LittleEndian, &entry.WillSend)
+		b, _ := buf.ReadByte()
+		entry.WillSend = (b >> 4) == 1
+		binary.Read(buf, binary.LittleEndian, &entry.TotalSize)
+		entry.FileName, _ = buf.ReadString(0)
+		// Trim off the null terminator
+		entry.FileName = entry.FileName[:len(entry.FileName)-1]
+		binary.Read(buf, binary.LittleEndian, &entry.MD5)
+		entries = append(entries, entry)
+	}
+	return entries
 }
 
 func unpackServerInfoPacket(data []byte) (*KartServerInfoPacket, error) {
@@ -184,7 +209,7 @@ func unpackServerInfoPacket(data []byte) (*KartServerInfoPacket, error) {
 		ActNum:         packetRaw.ActNum,
 		IsZone:         packetRaw.IsZone,
 		HttpSource:     nullTerminated(packetRaw.HttpSource[:]),
-		FileNeeded:     packetRaw.FileNeeded,
+		FileNeeded:     parseFileNeeded(packetRaw.FileNeeded, int(packetRaw.FileNeededNum)),
 	}
 	return &packet, nil
 }
@@ -242,7 +267,7 @@ func GetSRB2Info(adress string) (*KartServerInfoPacket, *KartClientInfoPacket, e
 			return nil, nil, fmt.Errorf("error getting information from udp: %w", err)
 		}
 
-		packet, err := readPacket(buffer[:])
+		packet, err := readPacket(buffer)
 		if err != nil {
 			return nil, nil, fmt.Errorf("error reading packet: %w", err)
 		}
@@ -253,6 +278,19 @@ func GetSRB2Info(adress string) (*KartServerInfoPacket, *KartClientInfoPacket, e
 		case packetTypeClientInfo:
 			clientInfoPacket = packet.(*KartClientInfoPacket)
 		}
+	}
+
+	// Filter out all players from the player info slice that have a node of 255
+	playersInGame := []KartClientInfoEntry{}
+	for _, player := range clientInfoPacket.ClientInfo {
+		if player.Node != 255 {
+			playersInGame = append(playersInGame, player)
+		}
+	}
+	clientInfoPacket.ClientInfo = playersInGame
+
+	if len(clientInfoPacket.ClientInfo) != int(serverInfoPacket.NumberOfPlayer) {
+		return nil, nil, fmt.Errorf("number of players in client info packet does not match number of players in server info packet: %w", err)
 	}
 
 	return serverInfoPacket, clientInfoPacket, nil
