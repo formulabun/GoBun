@@ -164,7 +164,7 @@ func readPacket(data []byte) (KartPacket, error) {
 	}
 }
 
-func parseFileNeeded(data [915]byte, fileNeededCount int) []FileNeededEntry {
+func parseFileNeeded(data []byte, fileNeededCount int) []FileNeededEntry {
 	var entries []FileNeededEntry
 	buf := bytes.NewBuffer(data[:])
 	for i := 0; i < fileNeededCount; i++ {
@@ -209,7 +209,7 @@ func unpackServerInfoPacket(data []byte) (*KartServerInfoPacket, error) {
 		ActNum:         packetRaw.ActNum,
 		IsZone:         packetRaw.IsZone,
 		HttpSource:     nullTerminated(packetRaw.HttpSource[:]),
-		FileNeeded:     parseFileNeeded(packetRaw.FileNeeded, int(packetRaw.FileNeededNum)),
+		FileNeeded:     parseFileNeeded(packetRaw.FileNeeded[:], int(packetRaw.FileNeededNum)),
 	}
 	return &packet, nil
 }
