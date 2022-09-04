@@ -22,7 +22,7 @@ type packetType uint8
 
 const (
 	packetTypeServerInfo packetType = 0x0D
-	packetTypeClientInfo packetType = 0x0E
+	packetTypePlayerInfo packetType = 0x0E
 )
 
 type KartPacket interface{
@@ -99,7 +99,7 @@ type FileNeededEntry struct {
 	MD5 [16]uint8
 }
 
-type kartClientInfoEntryRaw struct {
+type kartPlayerInfoEntryRaw struct {
 	Node         uint8
 	Name         [21 + 1]byte
 	Address      [4]uint8
@@ -110,12 +110,12 @@ type kartClientInfoEntryRaw struct {
 	TimeInServer uint16
 }
 
-type kartClientInfoPacketRaw struct {
+type kartPlayerInfoPacketRaw struct {
 	Header     KartPacketHeader
-	ClientInfo [32]kartClientInfoEntryRaw
+	PlayerInfo [32]kartPlayerInfoEntryRaw
 }
 
-type KartClientInfoEntry struct {
+type KartPlayerInfoEntry struct {
 	Node         uint8
 	Name         string
 	Address      [4]uint8
@@ -126,12 +126,12 @@ type KartClientInfoEntry struct {
 	TimeInServer uint16
 }
 
-type KartClientInfoPacket struct {
+type KartPlayerInfoPacket struct {
 	Header     KartPacketHeader
-	ClientInfo []KartClientInfoEntry
+	PlayerInfo []KartPlayerInfoEntry
 }
 
-func (p *KartClientInfoPacket) GetPacketType() packetType {
+func (p *KartPlayerInfoPacket) GetPacketType() packetType {
 	return p.Header.PacketType
 }
 
@@ -157,8 +157,8 @@ func readPacket(data []byte) (KartPacket, error) {
 	switch header.PacketType {
 	case packetTypeServerInfo:
 		return unpackServerInfoPacket(data)
-	case packetTypeClientInfo:
-		return unpackClientInfoPacket(data)
+	case packetTypePlayerInfo:
+		return unpackPlayerInfoPacket(data)
 	default:
 		return nil, fmt.Errorf("unknown packet type: %d", header.PacketType)
 	}
@@ -214,17 +214,17 @@ func unpackServerInfoPacket(data []byte) (*KartServerInfoPacket, error) {
 	return &packet, nil
 }
 
-func unpackClientInfoPacket(data []byte) (*KartClientInfoPacket, error) {
-	var packetRaw kartClientInfoPacketRaw
+func unpackPlayerInfoPacket(data []byte) (*KartPlayerInfoPacket, error) {
+	var packetRaw kartPlayerInfoPacketRaw
 	if err := binary.Read(bytes.NewReader(data), binary.LittleEndian, &packetRaw); err != nil {
 		return nil, err
 	}
-	packet := KartClientInfoPacket{
+	packet := KartPlayerInfoPacket{
 		Header: packetRaw.Header,
 	}
-	for i := 0; i < len(packetRaw.ClientInfo); i++ {
-		entry := packetRaw.ClientInfo[i]
-		packet.ClientInfo = append(packet.ClientInfo, KartClientInfoEntry{
+	for i := 0; i < len(packetRaw.PlayerInfo); i++ {
+		entry := packetRaw.PlayerInfo[i]
+		packet.PlayerInfo = append(packet.PlayerInfo, KartPlayerInfoEntry{
 			Node: entry.Node,
 			Name: nullTerminated(entry.Name[:]),
 			Address: [4]uint8{
@@ -243,7 +243,7 @@ func unpackClientInfoPacket(data []byte) (*KartClientInfoPacket, error) {
 	return &packet, nil
 }
 
-func GetSRB2Info(adress string) (*KartServerInfoPacket, *KartClientInfoPacket, error) {
+func GetSRB2Info(adress string) (*KartServerInfoPacket, *KartPlayerInfoPacket, error) {
 	udpAddr, err := net.ResolveUDPAddr("udp", adress)
 	if err != nil {
 		return nil, nil, err
@@ -256,11 +256,11 @@ func GetSRB2Info(adress string) (*KartServerInfoPacket, *KartClientInfoPacket, e
 	defer conn.Close()
 
 	var serverInfoPacket *KartServerInfoPacket
-	var clientInfoPacket *KartClientInfoPacket
+	var playerInfoPacket *KartPlayerInfoPacket
 
 	conn.SetReadBuffer(2048)
 	conn.Write(getServerInfoPacket[:])
-	for serverInfoPacket == nil || clientInfoPacket == nil {
+	for serverInfoPacket == nil || playerInfoPacket == nil {
 		buffer := make([]byte, 2048)
 		_, _, err := conn.ReadFromUDP(buffer)
 		if err != nil {
@@ -275,23 +275,23 @@ func GetSRB2Info(adress string) (*KartServerInfoPacket, *KartClientInfoPacket, e
 		switch packetType := packet.GetPacketType(); packetType {
 		case packetTypeServerInfo:
 			serverInfoPacket = packet.(*KartServerInfoPacket)
-		case packetTypeClientInfo:
-			clientInfoPacket = packet.(*KartClientInfoPacket)
+		case packetTypePlayerInfo:
+			playerInfoPacket = packet.(*KartPlayerInfoPacket)
 		}
 	}
 
 	// Filter out all players from the player info slice that have a node of 255
-	playersInGame := []KartClientInfoEntry{}
-	for _, player := range clientInfoPacket.ClientInfo {
+	playersInGame := []KartPlayerInfoEntry{}
+	for _, player := range playerInfoPacket.PlayerInfo {
 		if player.Node != 255 {
 			playersInGame = append(playersInGame, player)
 		}
 	}
-	clientInfoPacket.ClientInfo = playersInGame
+	playerInfoPacket.PlayerInfo = playersInGame
 
-	if len(clientInfoPacket.ClientInfo) != int(serverInfoPacket.NumberOfPlayer) {
-		return nil, nil, fmt.Errorf("number of players in client info packet does not match number of players in server info packet: %w", err)
+	if len(playerInfoPacket.PlayerInfo) != int(serverInfoPacket.NumberOfPlayer) {
+		return nil, nil, fmt.Errorf("number of players in player info packet does not match number of players in server info packet: %w", err)
 	}
 
-	return serverInfoPacket, clientInfoPacket, nil
+	return serverInfoPacket, playerInfoPacket, nil
 }
