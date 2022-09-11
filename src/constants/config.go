@@ -1,3 +1,8 @@
 package constants
 
-const BasePath = "/data/files"
+import "path/filepath"
+
+var (
+  BasePath = "/data"
+	FilePath = filepath.Join(BasePath, "files")
+)
