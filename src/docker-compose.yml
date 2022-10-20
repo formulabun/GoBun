@@ -1,5 +1,13 @@
 version: "3.7"
 services:
+  translator:
+    image: gobun-translator/latest
+    build:
+      dockerfile: Dockerfile.translator
+    ports:
+      - 5129:8080
+    network_mode:
+      host
   db:
     image: mongo:5.0.9
     ports:
@@ -9,6 +17,7 @@ services:
     volumes:
       - database:/data/db
   scripts:
+    image: gobun-scripts/latest
     build:
       dockerfile: Dockerfile.scripts
     stdin_open: true
