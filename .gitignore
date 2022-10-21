@@ -3,3 +3,6 @@
 
 # Build directory
 src/bin/*
+
+# openapi
+.openapi-generator/
