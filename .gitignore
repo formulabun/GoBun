@@ -6,3 +6,6 @@ src/bin/*
 
 # openapi
 .openapi-generator/
+
+# environment variable file
+.env

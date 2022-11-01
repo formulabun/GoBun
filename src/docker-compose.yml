@@ -1,13 +1,24 @@
 version: "3.7"
 services:
+
+  discord:
+    image: formulabun/discord:0.0.1
+    build:
+      dockerfile: Dockerfile.discord
+    environment:
+      TOKEN: "${DISCORD_TOKEN}"
+    network_mode:
+      host
+
   translator:
-    image: gobun-translator/latest
+    image: formulabun/translator:0.0.1
     build:
       dockerfile: Dockerfile.translator
     ports:
-      - 5129:8080
+      - 5092:5092
     network_mode:
       host
+
   db:
     image: mongo:5.0.9
     ports:
@@ -16,8 +27,9 @@ services:
       host
     volumes:
       - database:/data/db
+
   scripts:
-    image: gobun-scripts/latest
+    image: formulabun/scripts
     build:
       dockerfile: Dockerfile.scripts
     stdin_open: true

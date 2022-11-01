@@ -1,10 +1,26 @@
 version: "3.7"
 services:
+
   translator-swagger:
     image: swaggerapi/swagger-ui
+    network_mode:
+      host
     ports:
       - 80:8080
     volumes:
       - ./services/translator:/openapi
     environment:
       SWAGGER_JSON: /openapi/api.yml
+
+  translator-generate-server:
+    image: openapitools/openapi-generator-cli
+    volumes:
+      - ./services/translator:/local
+    command: generate -i /local/api.yml -g go-server -o /local/server --additional-properties=serverPort=5092
+
+  translator-generate-client:
+    image: openapitools/openapi-generator-cli
+    volumes:
+      - ./services/translator:/local
+    command: generate -i /local/api.yml -g go -o /local/client --additional-properties=isGoSubmodule=true
+
