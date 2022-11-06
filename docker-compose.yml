@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+
+  discord:
+    image: formulabun/discord:0.0.1
+    build:
+      dockerfile: Dockerfile.discord
+    environment:
+      TOKEN: "${DISCORD_TOKEN}"
+    network_mode: host
+
+  translator:
+    image: formulabun/translator:0.0.1
+    build:
+      dockerfile: Dockerfile.translator
+    ports:
+      - 5092:5092
+    network_mode: host

@@ -1,0 +1,47 @@
+## build srb2kart
+FROM ubuntu:latest as build
+
+# update system
+RUN apt-get update -y && apt-get upgrade -y && \
+    apt-get install -y git wget unzip cmake gcc g++ \
+    libsdl2-dev libsdl2-mixer-dev libupnp-dev libgme-dev libpng-dev libcurl4-openssl-dev
+
+# fetch code n shit
+WORKDIR /repo/
+RUN git clone https://github.com/STJr/Kart-Public.git && \
+    cd Kart-Public && git checkout v1.6 && mkdir -p assets/installer && \
+    wget --quiet https://github.com/STJr/Kart-Public/releases/download/v1.6/AssetsLinuxOnly.zip && \
+    unzip AssetsLinuxOnly.zip -d assets/installer && \
+    mkdir build && cmake -B build -S . && cd build && make
+
+## Run server
+FROM ubuntu:latest as run
+RUN apt-get update -y && apt-get upgrade -y && \
+    apt-get install -y libsdl2-2.0-0 libsdl2-mixer-2.0-0 libgme0 libcurl4 unzip
+
+# Expose network port
+EXPOSE 5029/udp
+
+# artifacts from build
+COPY --from=build /repo/Kart-Public/build/bin/srb2kart /usr/bin/
+COPY --from=build /repo/Kart-Public/AssetsLinuxOnly.zip /tmp
+RUN mkdir -p /usr/games/SRB2Kart && unzip /tmp/AssetsLinuxOnly.zip -d /usr/games/SRB2Kart && rm /tmp/AssetsLinuxOnly.zip
+
+# volumes with data
+VOLUME /luafiles
+VOLUME /configs
+VOLUME /addons
+
+# Symlink for config
+RUN ln -sf /configs/ $HOME/.srb2kart
+
+# Set working directory
+WORKDIR /usr/games/SRB2Kart
+RUN ln -sf /luafiles . 
+
+# Copy bash script and fix execute permission
+COPY srb2kart.sh /usr/bin/srb2kart.sh
+RUN chmod a+x /usr/bin/srb2kart.sh
+
+# Run script
+ENTRYPOINT ["srb2kart.sh"]

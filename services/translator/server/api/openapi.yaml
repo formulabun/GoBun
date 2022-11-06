@@ -1,0 +1,189 @@
+openapi: 3.0.0
+info:
+  title: Translator service between a srb2kart server and json
+  version: 0.0.1
+servers:
+- url: /
+paths:
+  /playerinfo:
+    get:
+      description: Returns the PT_PLAYERINFO data from the server containing information
+        about the current players
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerInfo'
+          description: success
+      summary: get the player infomation
+  /serverinfo:
+    get:
+      description: Returns the PT_SERVERINFO data from the server containing information
+        about the state of the server
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerInfo'
+          description: success
+      summary: get the server information
+components:
+  schemas:
+    CheckSum:
+      items:
+        type: number
+      type: array
+    FileNeeded:
+      items:
+        $ref: '#/components/schemas/FileNeeded_inner'
+      type: array
+    PlayerInfoEntry:
+      example:
+        Score: 2.3021358869347655
+        TimeInServer: 7.061401241503109
+        Address:
+        - 6.027456183070403
+        - 6.027456183070403
+        Node: 0.8008281904610115
+        Team: 1.4658129805029452
+        Skin: 5.962133916683182
+        Data: 5.637376656633329
+        Name: Name
+      properties:
+        Node:
+          type: number
+        Name:
+          type: string
+        Address:
+          items:
+            type: number
+          type: array
+        Team:
+          type: number
+        Skin:
+          type: number
+        Data:
+          type: number
+        Score:
+          type: number
+        TimeInServer:
+          type: number
+      type: object
+    PlayerInfo:
+      items:
+        $ref: '#/components/schemas/PlayerInfoEntry'
+      type: array
+    ServerInfo:
+      example:
+        ActNum: 1.2315135367772556
+        HttpSource: HttpSource
+        FileNeeded:
+        - WillSend: true
+          FileName: FileName
+          TotalSize: 1.4894159098541704
+          MD5:
+          - 6.84685269835264
+          - 6.84685269835264
+        - WillSend: true
+          FileName: FileName
+          TotalSize: 1.4894159098541704
+          MD5:
+          - 6.84685269835264
+          - 6.84685269835264
+        IsZone: 1.0246457001441578
+        ModifiedGame: true
+        PacketVersion: 0.8008281904610115
+        Time: 2.027123023002322
+        GameType: 7.061401241503109
+        LevelTime: 4.145608029883936
+        KartVars: 9.301444243932576
+        SubVersion: 5.962133916683182
+        MaxPlayers: 2.3021358869347655
+        MapName: MapName
+        MapMD5:
+        - 7.386281948385884
+        - 7.386281948385884
+        CheatsEnabled: true
+        Version: 1.4658129805029452
+        NumberOfPlayer: 5.637376656633329
+        ServerName: ServerName
+        MapTitle: MapTitle
+        FileNeededNum: 3.616076749251911
+        Application:
+        - 6.027456183070403
+        - 6.027456183070403
+        ServerNameRaw: ServerNameRaw
+      properties:
+        PacketVersion:
+          type: number
+        Application:
+          items:
+            type: number
+          type: array
+        Version:
+          type: number
+        SubVersion:
+          type: number
+        NumberOfPlayer:
+          type: number
+        MaxPlayers:
+          type: number
+        GameType:
+          type: number
+        ModifiedGame:
+          type: boolean
+        CheatsEnabled:
+          type: boolean
+        KartVars:
+          type: number
+        FileNeededNum:
+          type: number
+        Time:
+          type: number
+        LevelTime:
+          type: number
+        ServerNameRaw:
+          type: string
+        ServerName:
+          type: string
+        MapName:
+          type: string
+        MapTitle:
+          type: string
+        MapMD5:
+          items:
+            type: number
+          type: array
+        ActNum:
+          type: number
+        IsZone:
+          type: number
+        HttpSource:
+          type: string
+        FileNeeded:
+          items:
+            $ref: '#/components/schemas/FileNeeded_inner'
+          type: array
+      type: object
+    FileNeeded_inner:
+      example:
+        WillSend: true
+        FileName: FileName
+        TotalSize: 1.4894159098541704
+        MD5:
+        - 6.84685269835264
+        - 6.84685269835264
+      properties:
+        WillSend:
+          type: boolean
+        TotalSize:
+          type: number
+        FileName:
+          type: string
+        MD5:
+          items:
+            type: number
+          type: array
+      type: object
