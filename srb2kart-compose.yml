@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+
+  main:
+    image: formulabun/srb2kart:1.6.0
+    build:
+      dockerfile: Dockerfile.srb2kart
+    ports:
+      - "5029:5029/udp"
+    command: -file bonuschars.kart
+    volumes:
+      - type: bind
+        source: "${LUAFILESOURCE}"
+        target: "/luafiles"
+      - type: bind
+        source: "${CONFIGSOURCE}"
+        target: "/configs"
+      - type: bind
+        source: "${ADDONSOURCE}"
+        target: "/addons"

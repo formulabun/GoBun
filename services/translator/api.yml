@@ -1,0 +1,133 @@
+openapi: 3.0.0
+info:
+  title: Translator service between a srb2kart server and json
+  version: 0.0.1
+
+servers:
+  - url: "http://localhost:5092"
+
+paths:
+  "/playerinfo":
+    get:
+      summary: get the player infomation
+      description:
+        Returns the PT_PLAYERINFO data from the server containing information about the current players
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerInfo"
+
+  "/serverinfo":
+    get:
+      summary: get the server information
+      description:
+        Returns the PT_SERVERINFO data from the server containing information about the state of the server
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerInfo"
+
+components:
+  schemas:
+
+    CheckSum:
+      type: array
+      items:
+        type: number
+
+    FileNeeded:
+      type: array
+      items:
+        type: object
+        properties:
+          WillSend: 
+            type: boolean
+          TotalSize: 
+            type: number 
+          FileName: 
+            type: string
+          MD5: 
+            $ref: "#/components/schemas/CheckSum"
+
+    PlayerInfoEntry:
+      type: object
+      properties:
+        Node:
+          type: number
+        Name:
+          type: string
+        Address:
+          type: array
+          items:
+            type: number
+        Team:
+          type: number
+        Skin:
+          type: number
+        Data:
+          type: number
+        Score:
+          type: number
+        TimeInServer:
+          type: number
+
+    PlayerInfo:
+      type: array
+      items:
+        $ref: "#/components/schemas/PlayerInfoEntry"
+
+    ServerInfo:
+      type: object
+      properties:
+        PacketVersion:
+          type: number
+        Application:
+          type: array
+          items:
+            type: number 
+        Version:
+          type: number
+        SubVersion:
+          type: number
+        NumberOfPlayer:
+          type: number
+        MaxPlayers:
+          type: number
+        GameType:
+          type: number
+        ModifiedGame:
+          type: boolean
+        CheatsEnabled:
+          type: boolean
+        KartVars:
+          type: number
+        FileNeededNum:
+          type: number
+        Time:
+          type: number 
+        LevelTime:
+          type: number
+        ServerNameRaw:
+          type: string
+        ServerName:
+          type: string
+        MapName:
+          type: string
+        MapTitle:
+          type: string
+        MapMD5:
+          $ref: "#/components/schemas/CheckSum"
+        ActNum:
+          type: number
+        IsZone:
+          type: number
+        HttpSource:
+          type: string
+        FileNeeded:
+          $ref: "#/components/schemas/FileNeeded"
