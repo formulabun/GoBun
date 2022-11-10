@@ -19,9 +19,6 @@ FROM ubuntu:latest as run
 RUN apt-get update -y && apt-get upgrade -y && \
     apt-get install -y libsdl2-2.0-0 libsdl2-mixer-2.0-0 libgme0 libcurl4 unzip
 
-# Expose network port
-EXPOSE 5029/udp
-
 # artifacts from build
 COPY --from=build /repo/Kart-Public/build/bin/srb2kart /usr/bin/
 COPY --from=build /repo/Kart-Public/AssetsLinuxOnly.zip /tmp

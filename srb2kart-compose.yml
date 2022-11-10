@@ -6,8 +6,8 @@ services:
     build:
       dockerfile: Dockerfile.srb2kart
     ports:
-      - "5029:5029/udp"
-    command: bonuschars.kart
+      - "${SRB2KART_MAIN_PORT}:${SRB2KART_MAIN_PORT}/udp"
+    command: bonuschars.kart -port ${SRB2KART_MAIN_PORT}
     stdin_open: true
     tty: true
     volumes:

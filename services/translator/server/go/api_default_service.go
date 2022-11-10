@@ -18,16 +18,17 @@ import (
 // This service should implement the business logic for every endpoint for the DefaultApi API.
 // Include any external packages or services that will be required by this service.
 type DefaultApiService struct {
+  Target string
 }
 
 // NewDefaultApiService creates a default api service
-func NewDefaultApiService() DefaultApiServicer {
-	return &DefaultApiService{}
+func NewDefaultApiService(target string) DefaultApiServicer {
+	return &DefaultApiService{target}
 }
 
 // PlayerinfoGet - get the player infomation
 func (s *DefaultApiService) PlayerinfoGet(ctx context.Context) (ImplResponse, error) {
-  _, playerInfo, err := network.GetServerInfo("localhost:5029")
+  _, playerInfo, err := network.GetServerInfo(s.Target)
 
   if err != nil {
     return Response(500, nil), err 
@@ -38,7 +39,7 @@ func (s *DefaultApiService) PlayerinfoGet(ctx context.Context) (ImplResponse, er
 
 // ServerinfoGet - get the server information
 func (s *DefaultApiService) ServerinfoGet(ctx context.Context) (ImplResponse, error) {
-  serverInfo, _, err := network.GetServerInfo("localhost:5029")
+  serverInfo, _, err := network.GetServerInfo(s.Target)
 
   if err != nil {
     return Response(500, nil), err 

@@ -7,7 +7,6 @@ services:
       dockerfile: Dockerfile.discord
     environment:
       TOKEN: "${DISCORD_TOKEN}"
-    network_mode: host
 
   translator:
     image: formulabun/translator:0.0.1
@@ -15,4 +14,5 @@ services:
       dockerfile: Dockerfile.translator
     ports:
       - 5092:5092
-    network_mode: host
+    environment:
+      TOKEN: "${IP}:${SRB2KART_MAIN_PORT}"

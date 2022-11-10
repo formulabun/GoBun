@@ -17,9 +17,10 @@ import (
 )
 
 func main() {
+  validateEnvironment();
 	log.Printf("Server started")
 
-	DefaultApiService := openapi.NewDefaultApiService()
+	DefaultApiService := openapi.NewDefaultApiService(TARGET)
 	DefaultApiController := openapi.NewDefaultApiController(DefaultApiService)
 
 	router := openapi.NewRouter(DefaultApiController)
