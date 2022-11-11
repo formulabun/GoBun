@@ -3,7 +3,7 @@ info:
   title: Translator service between a srb2kart server and json
   version: 0.0.1
 servers:
-- url: http://localhost:5092
+- url: http://translator:5092
 paths:
   /playerinfo:
     get:

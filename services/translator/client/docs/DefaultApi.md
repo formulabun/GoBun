@@ -1,6 +1,6 @@
 # \DefaultApi
 
-All URIs are relative to *http://localhost:5092*
+All URIs are relative to *http://translator:5092*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------

@@ -2,17 +2,17 @@ version: "3.7"
 services:
 
   discord:
-    image: formulabun/discord:0.0.1
+    image: formulabun/discord:alpha
     build:
       dockerfile: Dockerfile.discord
     environment:
       TOKEN: "${DISCORD_TOKEN}"
 
   translator:
-    image: formulabun/translator:0.0.1
+    image: formulabun/translator:alpha
     build:
       dockerfile: Dockerfile.translator
     ports:
       - 5092:5092
     environment:
-      TOKEN: "${IP}:${SRB2KART_MAIN_PORT}"
+      TARGET: "${IP}:${SRB2KART_MAIN_PORT}"

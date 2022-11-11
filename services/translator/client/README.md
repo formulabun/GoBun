@@ -22,7 +22,7 @@ go get golang.org/x/net/context
 Put the package under your project folder and add the following in import:
 
 ```golang
-import openapi "github.com/GIT_USER_ID/GIT_REPO_ID/openapi"
+import openapi "github.com/GIT_USER_ID/GIT_REPO_ID"
 ```
 
 To use a proxy, set the environment variable `HTTP_PROXY`:
@@ -74,7 +74,7 @@ ctx = context.WithValue(context.Background(), openapi.ContextOperationServerVari
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *http://localhost:5092*
+All URIs are relative to *http://translator:5092*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------

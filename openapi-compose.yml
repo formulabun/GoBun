@@ -22,5 +22,4 @@ services:
     image: openapitools/openapi-generator-cli
     volumes:
       - ./services/translator:/local
-    command: generate -i /local/api.yml -g go -o /local/client --additional-properties=isGoSubmodule=true
-
+    command: generate -i /local/api.yml -g go -o /local/client --additional-properties=\"isGoSubmodule=true\"
