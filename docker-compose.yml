@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile.discord
     environment:
       TOKEN: "${DISCORD_TOKEN}"
+      APPLICATIONID: "${DISCORD_APPLICATION}"
+      TESTGUILD: "${DISCORD_TESTGUILD}"
 
   translator:
     image: formulabun/translator:alpha

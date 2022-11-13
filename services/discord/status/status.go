@@ -13,8 +13,10 @@ import (
 )
 
 var trClient *translator.APIClient
+var logger = log.Default()
 
 func Start(c dContext.DiscordContext) {
+  logger.SetPrefix("status | ")
 	ticker := time.NewTicker(5*time.Second)
 
 	config := translator.NewConfiguration()
@@ -74,12 +76,12 @@ func makeStatusData(info *translator.ServerInfo) discordgo.UpdateStatusData {
 func updateStatus(s *discordgo.Session) {
 	resp, _, err := trClient.DefaultApi.ServerinfoGet(context.Background()).Execute()
 	if err != nil {
-		log.Print(fmt.Sprintf("Could not get player count: %s", err))
+		logger.Print(fmt.Sprintf("Could not get player count: %s", err))
 		return
 	}
 	err = s.UpdateStatusComplex(makeStatusData(resp))
 	if err != nil {
-		log.Print(fmt.Sprintf("Could not update status: %s", err))
+		logger.Print(fmt.Sprintf("Could not update status: %s", err))
 		return
 	}
 }
