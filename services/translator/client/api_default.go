@@ -27,7 +27,7 @@ type ApiPlayerinfoGetRequest struct {
 	ApiService *DefaultApiService
 }
 
-func (r ApiPlayerinfoGetRequest) Execute() ([]PlayerInfoEntry, *http.Response, error) {
+func (r ApiPlayerinfoGetRequest) Execute() (*PlayerInfo, *http.Response, error) {
 	return r.ApiService.PlayerinfoGetExecute(r)
 }
 
@@ -47,13 +47,13 @@ func (a *DefaultApiService) PlayerinfoGet(ctx context.Context) ApiPlayerinfoGetR
 }
 
 // Execute executes the request
-//  @return []PlayerInfoEntry
-func (a *DefaultApiService) PlayerinfoGetExecute(r ApiPlayerinfoGetRequest) ([]PlayerInfoEntry, *http.Response, error) {
+//  @return PlayerInfo
+func (a *DefaultApiService) PlayerinfoGetExecute(r ApiPlayerinfoGetRequest) (*PlayerInfo, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  []PlayerInfoEntry
+		localVarReturnValue  *PlayerInfo
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.PlayerinfoGet")

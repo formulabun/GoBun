@@ -15,10 +15,11 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+
 func main() {
 	env.ValidateEnvironment()
 
-	log.Print("Hello World")
+	log.Print("Discord service is starting.")
 	session, err := discordgo.New(fmt.Sprintf("Bot %s", env.TOKEN))
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Could not create a client: %s", err))

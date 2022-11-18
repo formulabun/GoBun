@@ -11,7 +11,7 @@ Method | HTTP request | Description
 
 ## PlayerinfoGet
 
-> []PlayerInfoEntry PlayerinfoGet(ctx).Execute()
+> PlayerInfo PlayerinfoGet(ctx).Execute()
 
 get the player infomation
 
@@ -38,7 +38,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.PlayerinfoGet``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `PlayerinfoGet`: []PlayerInfoEntry
+    // response from `PlayerinfoGet`: PlayerInfo
     fmt.Fprintf(os.Stdout, "Response from `DefaultApi.PlayerinfoGet`: %v\n", resp)
 }
 ```
@@ -54,7 +54,7 @@ Other parameters are passed through a pointer to a apiPlayerinfoGetRequest struc
 
 ### Return type
 
-[**[]PlayerInfoEntry**](PlayerInfoEntry.md)
+[**PlayerInfo**](PlayerInfo.md)
 
 ### Authorization
 

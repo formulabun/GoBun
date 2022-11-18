@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	dContext "GoBun/services/discord/context"
@@ -13,11 +14,10 @@ import (
 )
 
 var trClient *translator.APIClient
-var logger = log.Default()
+var logger = log.New(os.Stdout, "/status | ", log.LstdFlags)
 
 func Start(c dContext.DiscordContext) {
-  logger.SetPrefix("status | ")
-	ticker := time.NewTicker(5*time.Second)
+	ticker := time.NewTicker(5 * time.Second)
 
 	config := translator.NewConfiguration()
 	trClient = translator.NewAPIClient(config)
