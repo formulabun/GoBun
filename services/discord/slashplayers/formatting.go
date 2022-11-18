@@ -21,6 +21,10 @@ func formatResponse(players, spectators []string) string {
 	playerPart := joinNames(players, "racing")
 	spectatorPart := joinNames(spectators, "watching")
 
+	if playerPart == "" && spectatorPart == "" {
+		return "Nobody is playing."
+	}
+
 	response := playerPart + " " + spectatorPart
 	response = bunString.Escape(response, '\\', '\\')
 	response = bunString.Escape(response, '*', '\\')
