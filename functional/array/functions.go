@@ -29,3 +29,15 @@ func Any[T any](array []T, function func(T) bool) bool {
 func All[T any](array []T, function func(T) bool) bool {
 	return !Any(array, inverse(function))
 }
+
+func Filter[T any](array []T, function func(T) bool) []T {
+  var i = 0
+	result := make([]T, len(array))
+  for _, t := range array {
+    if function(t) {
+      result[i] = t
+      i++
+    }
+  }
+  return result[:i]
+}

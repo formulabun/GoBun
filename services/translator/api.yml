@@ -78,9 +78,12 @@ components:
           type: number
 
     PlayerInfo:
-      type: array
-      items:
-        $ref: "#/components/schemas/PlayerInfoEntry"
+      type: object
+      properties:
+        PlayerInfo:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlayerInfoEntry"
 
     ServerInfo:
       type: object

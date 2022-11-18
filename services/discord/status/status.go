@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	dContext "GoBun/services/discord/context"
@@ -13,9 +14,10 @@ import (
 )
 
 var trClient *translator.APIClient
+var logger = log.New(os.Stdout, "/status | ", log.LstdFlags)
 
 func Start(c dContext.DiscordContext) {
-	ticker := time.NewTicker(5*time.Second)
+	ticker := time.NewTicker(5 * time.Second)
 
 	config := translator.NewConfiguration()
 	trClient = translator.NewAPIClient(config)
@@ -74,12 +76,12 @@ func makeStatusData(info *translator.ServerInfo) discordgo.UpdateStatusData {
 func updateStatus(s *discordgo.Session) {
 	resp, _, err := trClient.DefaultApi.ServerinfoGet(context.Background()).Execute()
 	if err != nil {
-		log.Print(fmt.Sprintf("Could not get player count: %s", err))
+		logger.Print(fmt.Sprintf("Could not get player count: %s", err))
 		return
 	}
 	err = s.UpdateStatusComplex(makeStatusData(resp))
 	if err != nil {
-		log.Print(fmt.Sprintf("Could not update status: %s", err))
+		logger.Print(fmt.Sprintf("Could not update status: %s", err))
 		return
 	}
 }

@@ -2,14 +2,16 @@ version: "3.7"
 services:
 
   discord:
-    image: formulabun/discord:alpha
+    image: formulabun/discord:0.1.0
     build:
       dockerfile: Dockerfile.discord
     environment:
       TOKEN: "${DISCORD_TOKEN}"
+      APPLICATIONID: "${DISCORD_APPLICATION}"
+      TESTGUILD: "${DISCORD_TESTGUILD}"
 
   translator:
-    image: formulabun/translator:alpha
+    image: formulabun/translator:0.1.0
     build:
       dockerfile: Dockerfile.translator
     ports:

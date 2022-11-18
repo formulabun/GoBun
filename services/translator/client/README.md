@@ -85,6 +85,7 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [FileNeededInner](docs/FileNeededInner.md)
+ - [PlayerInfo](docs/PlayerInfo.md)
  - [PlayerInfoEntry](docs/PlayerInfoEntry.md)
  - [ServerInfo](docs/ServerInfo.md)
 

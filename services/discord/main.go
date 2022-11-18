@@ -8,16 +8,19 @@ import (
 	"syscall"
 
 	"GoBun/services/discord/context"
+	"GoBun/services/discord/env"
+	"GoBun/services/discord/slashplayers"
 	"GoBun/services/discord/status"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func main() {
-	validateEnvironment()
 
-	log.Print("Hello World")
-	session, err := discordgo.New(fmt.Sprintf("Bot %s", TOKEN))
+func main() {
+	env.ValidateEnvironment()
+
+	log.Print("Discord service is starting.")
+	session, err := discordgo.New(fmt.Sprintf("Bot %s", env.TOKEN))
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Could not create a client: %s", err))
 	}
@@ -33,7 +36,9 @@ func main() {
 
 	ctx := context.DiscordContext{session, make(chan struct{})}
 
-	status.Start(ctx)
+	go status.Start(ctx)
+	go slashplayers.Start(ctx)
+
 	waitForShutdown(ctx)
 }
 
