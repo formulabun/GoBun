@@ -15,6 +15,17 @@ services:
     build:
       dockerfile: Dockerfile.translator
     ports:
-      - 5092:5092
+      - "5092:5092/tcp"
     environment:
       TARGET: "${IP}:${SRB2KART_MAIN_PORT}"
+
+  replays.store:
+    image: formalabun/replaystore:0.0.0
+    build:
+      dockerfile: Dockerfile.replays.store
+    ports:
+      - 8080:80/tcp
+    volumes:
+      - replays:/data
+volumes:
+  replays:

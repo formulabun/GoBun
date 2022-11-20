@@ -1,25 +1,25 @@
 version: "3.7"
 services:
 
-  translator-swagger:
+  swagger:
     image: swaggerapi/swagger-ui
     network_mode:
       host
     ports:
       - 80:8080
     volumes:
-      - ./services/translator:/openapi
+      - ./services/replays/store:/openapi
     environment:
       SWAGGER_JSON: /openapi/api.yml
 
-  translator-generate-server:
+  generate-server:
     image: openapitools/openapi-generator-cli
     volumes:
-      - ./services/translator:/local
-    command: generate -i /local/api.yml -g go-server -o /local/server --additional-properties=serverPort=5092
+      - ./services/replays/store:/local
+    command: generate -i /local/api.yml -g go-server -o /local/server
 
-  translator-generate-client:
+  generate-client:
     image: openapitools/openapi-generator-cli
     volumes:
-      - ./services/translator:/local
+      - ./services/replays/store:/local
     command: generate -i /local/api.yml -g go -o /local/client --additional-properties=\"isGoSubmodule=true\"

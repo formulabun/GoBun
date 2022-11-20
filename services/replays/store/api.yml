@@ -1,0 +1,46 @@
+openapi: 3.0.0
+info:
+  title: GoBun File Store
+  version: 0.0.1
+
+servers:
+  - url: "storage.replay"
+
+paths:
+  /:
+    post:
+      summary: "Upload a new replay file"
+      requestBody:
+          description: "a replay file"
+          required: true
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      responses:
+        201:
+          description: "created"
+        400:
+          description: "bad replay file"
+        409:
+          description: "conflicting checksum"
+  /list:
+    get:
+      summary: "Get the list of replay files"
+      responses:
+        200:
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+                - MAP01-cream-time-best.lmp
+                - MAP02-cream-time-best.lmp
+                - MAP03-cream-time-best.lmp
+                - MAP04-cream-time-best.lmp
+                - MAP05-cream-time-best.lmp
+
