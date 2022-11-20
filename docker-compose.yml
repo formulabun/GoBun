@@ -20,12 +20,18 @@ services:
       TARGET: "${IP}:${SRB2KART_MAIN_PORT}"
 
   replays.store:
-    image: formalabun/replaystore:0.0.0
+    image: formulabun/replaystore:0.0.0
     build:
       dockerfile: Dockerfile.replays.store
-    ports:
-      - 8080:80/tcp
     volumes:
       - replays:/data
+
+  replays.download:
+    image: formulabun/replaydownload:0.0.0
+    build:
+      dockerfile: Dockerfile.replays.download
+    volumes:
+      - replays:/data
+    
 volumes:
   replays:

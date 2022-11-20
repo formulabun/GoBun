@@ -8,18 +8,18 @@ services:
     ports:
       - 80:8080
     volumes:
-      - ./services/replays/store:/openapi
+      - ./services/replays/download:/openapi
     environment:
       SWAGGER_JSON: /openapi/api.yml
 
   generate-server:
     image: openapitools/openapi-generator-cli
     volumes:
-      - ./services/replays/store:/local
+      - ./services/replays/download:/local
     command: generate -i /local/api.yml -g go-server -o /local/server
 
   generate-client:
     image: openapitools/openapi-generator-cli
     volumes:
-      - ./services/replays/store:/local
+      - ./services/replays/download:/local
     command: generate -i /local/api.yml -g go -o /local/client --additional-properties=\"isGoSubmodule=true\"
