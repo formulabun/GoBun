@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: GoBun replay download
+  version: 0.0.1
+
+servers:
+  - url: "download.replay"
+
+paths:
+  /replay/{id}:
+    get:
+      summary: Get a replay
+      parameters:
+        - name: id
+          in: path
+          description: id of the replay
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: string
+          example: 5467b9431885cea64dc7679f29f92e12
+
+      responses:
+        200: 
+          description: OK
+          headers:
+            Content-Disposition:
+              description: The filename of the replay
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+
+        404:
+          description: Replay does not exist
+
+
+  /staff:
+    get:
+      summary: Get a replay as staff
+      parameters:
+        - name: ids
+          in: query
+          description: List of replay ids
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: array
+            items:
+              type: string
+          example:
+            - 5467b9431885cea64dc7679f29f92e12
+            - 28e0c2444c531ede4e03c7a27eaa7de9
+
+      responses:
+        200:
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        204:
+          description: No ids were provided
+        206:
+          description: Not all ids could be found
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
