@@ -11,7 +11,6 @@ package openapi
 
 import (
 	"context"
-	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -66,15 +65,15 @@ func (s *DefaultApiService) RootPost(ctx context.Context, data io.ReadCloser) (I
 		return Response(http.StatusInternalServerError, err), err
 	}
 
-	err = binary.Write(file, binary.LittleEndian, header)
+	err = header.Write(file)
 	if err != nil {
-		return Response(http.StatusInternalServerError, err), err
-	}
-	_, err = io.Copy(file, data)
-	if err != nil {
-		return Response(http.StatusInternalServerError, err), err
+		return Response(http.StatusInternalServerError, err), fmt.Errorf("Could not write the replay file: %s", err)
 	}
 
-	replayName := header.GetTitle()
-	return Response(http.StatusOK, replayName), nil
+	_, err = io.Copy(file, data)
+	if err != nil {
+		return Response(http.StatusInternalServerError, err), fmt.Errorf("Could not write the replay file: %s", err)
+	}
+
+	return Response(http.StatusOK, header), nil
 }

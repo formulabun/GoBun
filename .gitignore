@@ -9,3 +9,6 @@ bin/*
 
 # environment variable file
 .env
+
+# debug
+.gdbrc

@@ -12,6 +12,7 @@ package openapi
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -49,6 +50,7 @@ type ErrorHandler func(w http.ResponseWriter, r *http.Request, err error, result
 // DefaultErrorHandler defines the default logic on how to handle errors from the controller. Any errors from parsing
 // request params will return a StatusBadRequest. Otherwise, the error code originating from the servicer will be used.
 func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, result *ImplResponse) {
+	log.Print(err)
 	if _, ok := err.(*ParsingError); ok {
 		// Handle parsing errors
 		EncodeJSONResponse(err.Error(), func(i int) *int { return &i }(http.StatusBadRequest), w)

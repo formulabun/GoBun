@@ -8,13 +8,21 @@ func Map[T any, P any](array []T, function func(T) P) []P {
 	return result
 }
 
-func FindFirst[T any](array []T, function func(T) bool) *T {
-	for _, t := range array {
+func FindFirstIndex[T any](array []T, function func(T) bool) int {
+	for i, t := range array {
 		if function(t) {
-			return &t
+			return i
 		}
 	}
-	return nil
+	return -1
+}
+
+func FindFirst[T any](array []T, function func(T) bool) *T {
+  i := FindFirstIndex(array, function)
+  if i >= 0 && i < len(array) {
+    return &array[i]
+  }
+  return nil
 }
 
 func Any[T any](array []T, function func(T) bool) bool {
