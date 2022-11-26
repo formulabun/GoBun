@@ -17,6 +17,10 @@ func FindFirstIndex[T any](array []T, function func(T) bool) int {
 	return -1
 }
 
+func FindFirstIndexMatching[T comparable](array []T, toSearch T) int {
+  return FindFirstIndex(array, equals(toSearch))
+}
+
 func FindFirst[T any](array []T, function func(T) bool) *T {
   i := FindFirstIndex(array, function)
   if i >= 0 && i < len(array) {

@@ -75,5 +75,5 @@ func (s *DefaultApiService) RootPost(ctx context.Context, data io.ReadCloser) (I
 		return Response(http.StatusInternalServerError, err), fmt.Errorf("Could not write the replay file: %s", err)
 	}
 
-	return Response(http.StatusOK, header), nil
+	return Response(http.StatusOK, nil), nil
 }

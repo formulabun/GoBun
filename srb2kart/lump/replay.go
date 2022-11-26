@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"time"
 
 	"GoBun/functional/array"
 	"GoBun/functional/strings"
@@ -16,11 +17,12 @@ const headerLength = 12 + 8 + 8 + 16 + 64 + 16
 var demoHeader = "KartReplay"
 
 type ReplayRaw struct {
-	ReplayHeaderRaw
+	HeaderPreFileEntries
 	WadEntries
+	HeaderPostFileEntries
 }
 
-type ReplayHeaderRaw struct {
+type HeaderPreFileEntries struct {
 	DemoHeader  [12]byte
 	Version     uint8
 	SubVersion  uint8
@@ -46,18 +48,29 @@ type WadEntry struct {
 	WadMd5   [16]byte
 }
 
+type HeaderPostFileEntries struct {
+	Time uint32
+	Lap  uint32
+
+	Seed     uint32
+	Reserved uint32
+
+	CVarCount int16
+}
+
 func ReadReplayData(data []byte) (result ReplayRaw, err error) {
 	dataReader := bytes.NewReader(data)
 	return ReadReplay(dataReader)
 }
 
 func ReadReplay(data io.Reader) (result ReplayRaw, err error) {
-	var headerPreReplays ReplayHeaderRaw
+	var headerPreReplays HeaderPreFileEntries
 	err = binary.Read(data, binary.LittleEndian, &headerPreReplays)
 	if err != nil {
 		return result, fmt.Errorf("Could not read the replay header before addons: %s", err)
 	}
-	result.ReplayHeaderRaw = headerPreReplays
+	result.HeaderPreFileEntries = headerPreReplays
+
 	fileCount := int(result.FileCount)
 	result.WadEntries = make([]WadEntry, fileCount)
 	readCount := 0
@@ -69,56 +82,65 @@ func ReadReplay(data io.Reader) (result ReplayRaw, err error) {
 		result.WadEntries[readCount] = entry
 		readCount++
 	}
+
+	var headerPostReplays HeaderPostFileEntries
+	err = binary.Read(data, binary.LittleEndian, &headerPostReplays)
+	if err != nil {
+		return result, fmt.Errorf("Could not read the replay header before addons: %s", err)
+	}
+	result.HeaderPostFileEntries = headerPostReplays
+
 	return result, validate(result)
 }
 
 func (R *ReplayRaw) Write(writer io.Writer) error {
-  err := binary.Write(writer, binary.LittleEndian, R.ReplayHeaderRaw)
-  if err != nil {
-    return fmt.Errorf("Could not write the replay header: %s", err)
-  }
-  for _, replayEntry := range R.WadEntries {
-    _, err = io.WriteString(writer, replayEntry.FileName)
-    if err != nil {
-      return fmt.Errorf("Could not write replay file name: %s", err)
-    }
-    writer.Write([]byte{0x0})
-    _, err = writer.Write(replayEntry.WadMd5[:])
-    if err != nil {
-      return fmt.Errorf("Could not write replay file checksum: %s", err)
-    }
-  }
-  return nil
+	err := binary.Write(writer, binary.LittleEndian, R.HeaderPreFileEntries)
+	if err != nil {
+		return fmt.Errorf("Could not write the replay header: %s", err)
+	}
+	for _, replayEntry := range R.WadEntries {
+		_, err = io.WriteString(writer, replayEntry.FileName)
+		if err != nil {
+			return fmt.Errorf("Could not write replay file name: %s", err)
+		}
+		writer.Write([]byte{0x0})
+		_, err = writer.Write(replayEntry.WadMd5[:])
+		if err != nil {
+			return fmt.Errorf("Could not write replay file checksum: %s", err)
+		}
+	}
+	return nil
 }
 
 func readWadEntry(data io.Reader) (result WadEntry, err error) {
-	var fileName bytes.Buffer
+	var filename bytes.Buffer
+	buffer := make([]byte, 16)
 
-	buffer := make([]byte, 17) // length of checksum + null character
-	for n, err := data.Read(buffer); err == nil; {
+	for {
+		n, err := data.Read(buffer)
 		if err != nil {
-			return result, err
+			return result, fmt.Errorf("Could not read a file entry from the replay: ", err)
 		}
-		if n < len(buffer) {
-			return result, errors.New("Unexpected end of replay file")
+		if n < 16 {
+			return result, fmt.Errorf("Unexpected end to the replay file.")
 		}
 
-		i := array.FindFirstIndex(buffer, func(b byte) bool {
-			return b == 0x0
-		})
-		if i < 0 || i >= len(buffer) {
-			fileName.Write(buffer)
-		} else {
-			fileName.Write(buffer[:i])
-			result.FileName = fileName.String()
-			copy(result.WadMd5[:], buffer[i+1:])
-			md5 := make([]byte, i)
-			data.Read(md5)
-			copy(result.WadMd5[len(buffer)-i-1:], md5)
+		found := array.FindFirstIndexMatching(buffer, 0x00)
+		if found >= 0 {
+			filename.Write(buffer[:found+1])
+			result.FileName = filename.String()
+			copy(result.WadMd5[:len(buffer)-found-1], buffer[found+1:])
+			n, err = data.Read(result.WadMd5[:found+1]) // TODO don't ignore errors
+			if err != nil {
+				return result, fmt.Errorf("Could not read a file entry from the replay: ", err)
+			}
+			if n < found {
+				return result, fmt.Errorf("Unexpected end to the replay file.")
+			}
 			return result, nil
 		}
+		filename.Write(buffer)
 	}
-	return result, err
 }
 
 func validate(replay ReplayRaw) error {
@@ -137,6 +159,14 @@ func validate(replay ReplayRaw) error {
 	return nil
 }
 
-func (r *ReplayHeaderRaw) GetTitle() string {
+func (r *HeaderPreFileEntries) GetTitle() string {
 	return strings.SafeNullTerminated(r.Title[:])
+}
+
+func (r *HeaderPostFileEntries) GetTime() time.Duration {
+	return time.Millisecond * time.Duration(1000 * r.Time / 35)
+}
+
+func (r *HeaderPostFileEntries) GetBestLapTime() time.Duration {
+	return time.Millisecond * time.Duration(1000 * r.Lap / 35)
 }

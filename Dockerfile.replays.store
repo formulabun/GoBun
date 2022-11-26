@@ -9,7 +9,7 @@ COPY . .
 ENV CGO_ENABLED=0
 RUN go get -d -v ./...
 
-RUN go build -a -installsuffix cgo -gcflags=all="-N -l" -o openapi services/replays/store/server/main.go
+RUN go build -installsuffix cgo -gcflags=all="-N -l" -o openapi services/replays/store/server/main.go
 
 FROM scratch AS runtime
 VOLUME /data
