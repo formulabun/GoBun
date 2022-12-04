@@ -23,6 +23,7 @@ var command = &discordgo.ApplicationCommand{
 	Name:        "players",
 	Description: "Get player info",
 }
+var commandId string
 
 func Start(c dContext.DiscordContext) {
 	config := translator.NewConfiguration()
@@ -41,6 +42,7 @@ func Start(c dContext.DiscordContext) {
 	if err != nil {
 		logger.Fatal(err)
 	}
+  commandId = command.ID
 
 	destroy := c.S.AddHandler(reply)
 
@@ -52,6 +54,12 @@ func Start(c dContext.DiscordContext) {
 }
 
 func reply(s *discordgo.Session, interaction *discordgo.InteractionCreate) {
+  if interaction.Interaction.Type != discordgo.InteractionApplicationCommand {
+    return
+  }
+  if interaction.Interaction.ApplicationCommandData().ID != commandId {
+    return
+  }
 	logger.Println("Interaction created")
 	data, _, _ := request.Execute()
 

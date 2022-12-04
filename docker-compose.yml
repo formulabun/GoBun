@@ -2,7 +2,7 @@ version: "3.7"
 services:
 
   discord:
-    image: formulabun/discord:0.1.1
+    image: formulabun/discord:0.1.2-festive
     build:
       dockerfile: Dockerfile.discord
     environment:

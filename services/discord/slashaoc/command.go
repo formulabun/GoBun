@@ -29,14 +29,16 @@ var command = &discordgo.ApplicationCommand{
 	Description:              "Get Advent of Code private leaderboard",
 	DefaultMemberPermissions: &nonePermission,
 }
+var commandId string
 
 func Start(c dContext.DiscordContext) {
 	logger.Println("Registering command")
-	_, err := c.S.ApplicationCommandCreate(env.APPICATIONID, env.TESTGUILD, command)
+	command, err := c.S.ApplicationCommandCreate(env.APPICATIONID, env.TESTGUILD, command)
 	if err != nil {
 		logger.Printf("Couldn't register my command: \n", err)
 		return
 	}
+  commandId = command.ID
 
 	destroy := c.S.AddHandler(reply)
 
@@ -58,6 +60,12 @@ func timeout() {
 }
 
 func reply(s *discordgo.Session, interaction *discordgo.InteractionCreate) {
+  if interaction.Interaction.Type != discordgo.InteractionApplicationCommand {
+    return
+  }
+  if interaction.Interaction.ApplicationCommandData().ID != commandId {
+    return
+  }
 	go timeout()
 
 	dataLock.Lock()
@@ -82,7 +90,7 @@ func format(data *members) discordgo.InteractionResponseData {
 	embed.Fields = make([]*discordgo.MessageEmbedField, len(*data))
 	embed.Color = 0x62ff29
 	embed.URL = "https://adventofcode.com/2022/"
-	embed.Description = "Join our leaderboard with `2605039`"
+	embed.Description = "Join our leaderboard with `2605039-4d89e8dd`"
 	embed.Footer = &discordgo.MessageEmbedFooter{
 		Text: "Happy coding!",
 	}
