@@ -10,6 +10,7 @@ import (
 	"GoBun/services/discord/context"
 	"GoBun/services/discord/env"
 	"GoBun/services/discord/slashplayers"
+	"GoBun/services/discord/slashaoc"
 	"GoBun/services/discord/status"
 
 	"github.com/bwmarrin/discordgo"
@@ -38,6 +39,7 @@ func main() {
 
 	go status.Start(ctx)
 	go slashplayers.Start(ctx)
+  go slashaoc.Start(ctx)
 
 	waitForShutdown(ctx)
 }

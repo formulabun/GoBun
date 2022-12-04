@@ -34,7 +34,6 @@ func Start(c dContext.DiscordContext) {
 	for err != nil {
 		<-time.After(time.Second * 5)
 		_, _, err = request.Execute()
-		logger.Println(err)
 	}
 	logger.Println("Connection gotten, registering command.")
 
